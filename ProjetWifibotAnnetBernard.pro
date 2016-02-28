@@ -13,12 +13,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    connexionServeur.cpp \
-    connexionClient.cpp
+        mainwindow.cpp
 
-HEADERS  += mainwindow.h \
-    connexionServeur.h \
-    connexionClient.h
+HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui

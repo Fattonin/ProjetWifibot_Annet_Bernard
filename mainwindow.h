@@ -2,10 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtNetwork>
 
 namespace Ui {
 class MainWindow;
 }
+
 
 class MainWindow : public QMainWindow
 {
@@ -15,7 +17,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+
+    void connexion_OK();
+    void deconnexion();
+    void on_B_conect_clicked();
+    void on_B_envoi_clicked();
+    void lecture();
+
 private:
+    QTcpSocket *soc;
     Ui::MainWindow *ui;
 };
 

@@ -41,7 +41,7 @@ void MainWindow::deconnexion()
 void MainWindow::on_B_envoi_clicked()
 {
     QTextStream texte(soc); // on associe un flux à la socket
-    texte << ui->Envoi->text() <<endl;        // on écrit dans le flux le texte saisi dans l'IHM
+    //texte << ui->char_9->text() <<endl;
 }
 
 void MainWindow::lecture()
@@ -49,4 +49,9 @@ void MainWindow::lecture()
     while (soc->canReadLine()) { // tant qu'il y a quelque chose à lire dans la socket
         ui->recu->setText(soc->readLine());  // on lit une ligne
     }
+}
+
+void MainWindow::on_dial_sliderPressed()
+{
+
 }

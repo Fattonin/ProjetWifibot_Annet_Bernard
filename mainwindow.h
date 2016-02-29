@@ -25,6 +25,8 @@ private slots:
     void on_B_envoi_clicked();
     void lecture();
 
+    void on_dial_sliderPressed();
+
 private:
     QTcpSocket *soc;
     Ui::MainWindow *ui;

@@ -5,12 +5,12 @@
 #-------------------------------------------------
 
 QT       += core gui
-
+QT += network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ProjetWifibotAnnetBernard
 TEMPLATE = app
-QT += network
+
 
 SOURCES += main.cpp\
         mainwindow.cpp

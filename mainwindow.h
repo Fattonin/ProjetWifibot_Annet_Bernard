@@ -5,6 +5,7 @@
 #include <QtNetwork>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include "envoi.h"
 
 
 namespace Ui {
@@ -17,7 +18,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent2 = 0);
     ~MainWindow();
 
 private slots:
@@ -25,20 +26,14 @@ private slots:
     void connexion_OK();
     void deconnexion();
     void on_B_conect_clicked();
-    void lecture();
-
-    void on_comboBox_currentIndexChanged(const QString &arg1);
-
-
-    void on_dial_valueChanged(int value);
-
     void on_dial_sliderPressed();
-
     void on_dial_sliderReleased();
+
+    void on_pushButton_clicked();
 
 private:
     QTcpSocket *soc;
-    QByteArray envoi;
+    envoi *e;
     Ui::MainWindow *ui;
 };
 

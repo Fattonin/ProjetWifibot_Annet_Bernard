@@ -1,8 +1,8 @@
 #ifndef ENVOI_H
 #define ENVOI_H
 
-#include <QThread>;
-#include <QTcpSocket>;
+#include <QThread>
+#include <QTcpSocket>
 
 class envoi : public QThread
 {

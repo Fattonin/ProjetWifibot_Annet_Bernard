@@ -1,6 +1,6 @@
 #include "envoi.h"
 
-envoi::envoi(QObject *parent, QTcpSocket *soc):QThread(parent)
+envoi::envoi(QObject *parent,QTcpSocket *soc):QThread(parent)
 {
    arret=false;
    s=soc;
@@ -19,19 +19,20 @@ void envoi::run()
         this->sleep(200);
 
         buffer.clear();
-        buffer.append(0xff);
-        buffer.append(0x07);
-        buffer.append(0x78);
+        buffer.append((char)0xff);
+        buffer.append((char)0x07);
+        buffer.append((char)0x78);
         buffer.append((char)0x00);
-        buffer.append(0x78);
+        buffer.append((char)0x78);
         buffer.append((char)0x00);
-        buffer.append(0x50);
+        buffer.append((char)0x50);
 
         quint16 crc=crc16(buffer);
         buffer.append((char)crc);
         buffer.append((char)(crc>>8));
 
         s->write(buffer);
+        s->flush();
     }
 }
 

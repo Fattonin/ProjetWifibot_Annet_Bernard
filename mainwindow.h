@@ -5,6 +5,8 @@
 #include <QtNetwork>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include <QWebView>
+#include <QUrl>
 #include "envoi.h"
 
 
@@ -28,10 +30,10 @@ private slots:
     void on_B_conect_clicked();
     void on_dial_sliderPressed();
     void on_dial_sliderReleased();
-
     void on_pushButton_clicked();
 
 private:
+    QWebView *webcam;
     QTcpSocket *soc;
     envoi *e;
     Ui::MainWindow *ui;

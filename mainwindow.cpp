@@ -49,7 +49,7 @@ void MainWindow::deconnexion()
 
 void MainWindow::on_dial_sliderPressed()
 {
-    e=new envoi(this,soc);  //pblm
+    e=new envoi(this,soc);
     e->start();
 }
 

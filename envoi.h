@@ -1,20 +1,15 @@
 #ifndef ENVOI_H
 #define ENVOI_H
 
-#include <QThread>
-#include <QTcpSocket>
 
-class envoi : public QThread
+class envoi
 {
 
-private:
-    QTcpSocket *s;
-    bool arret;
-
+private slots:
+    QByteArray data();
 public:
-    envoi(QObject *parent,QTcpSocket *soc);
-    ~envoi();
-    void run();
+    envoi();
+    void go();
     quint16 crc16(QByteArray buffer);
 };
 

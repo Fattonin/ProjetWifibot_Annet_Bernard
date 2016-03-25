@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "fenetrecam.h"
+#include "fenetrecam2.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])

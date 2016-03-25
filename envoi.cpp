@@ -1,22 +1,21 @@
 #include "envoi.h"
+#include <QTimer>
 
-envoi::envoi(QObject *parent,QTcpSocket *soc):QThread(parent)
+
+envoi::envoi()
+{}
+
+void envoi::go()
 {
-   arret=false;
-   s=soc;
+    QTimer *t=new QTimer(this);
+    t->setInterval();
+    connect(t, SIGNAL(timeout()),this,SLOT(data()));
+    t->start();
 }
 
-envoi::~envoi(){
-    arret=true;
-}
+QByteArray envoi::data(){
 
-void envoi::run()
-{
     QByteArray buffer;
-
-    while(!arret){
-
-        this->sleep(200);
 
         buffer.clear();
         buffer.append((char)0xff);
@@ -31,9 +30,7 @@ void envoi::run()
         buffer.append((char)crc);
         buffer.append((char)(crc>>8));
 
-        s->write(buffer);
-        s->flush();
-    }
+     return buffer;
 }
 
 quint16 envoi::crc16(QByteArray buffer) {

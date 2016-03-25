@@ -49,14 +49,79 @@ void MainWindow::deconnexion()
 
 void MainWindow::on_dial_sliderPressed()
 {
-    e=new envoi(this,soc);
-    e->start();
+    /*int angle=ui->dial->value();
+    int BV=ui->comboBox->currentText();*/
+    data();  //inutile
+    this->go();
 }
 
 void MainWindow::on_dial_sliderReleased()
 {
-    delete e;
+    buffer.clear();
+    buffer.append((char)0xff);
+    buffer.append((char)0x07);
+    buffer.append((char)0x00);
+    buffer.append((char)0x00);
+    buffer.append((char)0x00);
+    buffer.append((char)0x00);
+    buffer.append((char)0x50);
+
+    quint16 crc=crc16(buffer);
+    buffer.append((char)crc);
+    buffer.append((char)(crc>>8));
 }
 
+void MainWindow::go()
+{
+    QTimer *t=new QTimer(this);
+    t->setInterval(25);
+    connect(t, SIGNAL(timeout()),this,SLOT(envoi()));
+    t->start();
+}
+
+void MainWindow::data(){
+
+        buffer.clear();
+        buffer.append((char)0xff);
+        buffer.append((char)0x07);
+        buffer.append((char)0x78);
+        buffer.append((char)0x00);
+        buffer.append((char)0x78);
+        buffer.append((char)0x00);
+        buffer.append((char)0x50);
+
+        quint16 crc=crc16(buffer);
+        buffer.append((char)crc);
+        buffer.append((char)(crc>>8));
+}
+
+void MainWindow::envoi(){
+    soc->write(buffer);
+    soc->flush();
+}
+
+quint16 MainWindow::crc16(QByteArray buffer) {
+
+    quint16 crc = 0xFFFF;
+    quint16 polynome = 0xA001;
+    unsigned int parity = 0;
+    unsigned int cptBit;
+    unsigned int cptOct;
+
+    for (cptOct = 1; cptOct < 7; cptOct++){
+
+        crc ^= (unsigned char) buffer.at(cptOct);
+
+        for (cptBit = 0; cptBit <= 7 ; cptBit++){
+
+            parity = crc;
+            crc >>= 1;
+
+            if (parity % 2 == true) crc ^= polynome;
+        }
+    }
+
+    return crc;
+}
 
 

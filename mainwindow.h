@@ -5,9 +5,6 @@
 #include <QtNetwork>
 #include <QTcpSocket>
 #include <QAbstractSocket>
-#include <QWebView>
-#include <QUrl>
-#include "envoi.h"
 
 
 namespace Ui {
@@ -24,7 +21,10 @@ public:
     ~MainWindow();
 
 private slots:
-
+    void data();
+    void go();
+    void envoi();
+    quint16 crc16(QByteArray buffer);
     void connexion_OK();
     void deconnexion();
     void on_B_conect_clicked();
@@ -33,10 +33,9 @@ private slots:
     void on_pushButton_clicked();
 
 private:
-    QWebView *webcam;
     QTcpSocket *soc;
-    envoi *e;
     Ui::MainWindow *ui;
+    QByteArray buffer;
 };
 
 #endif // MAINWINDOW_H

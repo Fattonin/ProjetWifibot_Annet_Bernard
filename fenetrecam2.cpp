@@ -5,7 +5,7 @@ fenetreCam2::fenetreCam2(QWidget *parent3) :QMainWindow(parent3),ui(new Ui::fene
 {
     ui->setupUi(this);
     webcam = new QWebView(this);
-    webcam->setGeometry(5,5,500,350);
+    webcam->setGeometry(5,5,350,260);
     webcam->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
 }
 

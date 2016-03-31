@@ -4,6 +4,9 @@
 MainWindow::MainWindow(QWidget *parent2) : QMainWindow(parent2), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    webcam = new QWebView(this);
+    webcam->setGeometry(235,50,340,250);
+    webcam->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
 
     soc = new QTcpSocket(this);
     //creation de la socket
@@ -11,6 +14,14 @@ MainWindow::MainWindow(QWidget *parent2) : QMainWindow(parent2), ui(new Ui::Main
     // signal émis lors de la connexion au serveur
     connect(soc, SIGNAL(disconnected()),this, SLOT(deconnexion()));
     // signal émis lors de la deconnexion au serveur
+}
+
+void MainWindow::on_menu_tabBarClicked(int index)
+{
+    if(index==0){
+        webcam->setVisible(true);
+    }
+    else webcam->setVisible(false);
 }
 
 
@@ -39,6 +50,8 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow :: connexion_OK()
 {
     ui->Info->setText("connexion OK");
+    this->go();
+    this->lets();
 
 }
 
@@ -47,29 +60,28 @@ void MainWindow::deconnexion()
     ui->Info->setText("plus de connexion !");
 }
 
-void MainWindow::on_dial_sliderPressed()
-{
-    /*int angle=ui->dial->value();
-    int BV=ui->comboBox->currentText();*/
-    data();  //inutile
-    this->go();
-}
 
 void MainWindow::on_dial_sliderReleased()
 {
+    remplir(0,0,0);
+}
+
+void MainWindow::remplir(char c1,char c2,char c3){
+
     buffer.clear();
     buffer.append((char)0xff);
     buffer.append((char)0x07);
+    buffer.append(c1);
     buffer.append((char)0x00);
+    buffer.append(c2);
     buffer.append((char)0x00);
-    buffer.append((char)0x00);
-    buffer.append((char)0x00);
-    buffer.append((char)0x50);
+    buffer.append(c3);
 
     quint16 crc=crc16(buffer);
     buffer.append((char)crc);
     buffer.append((char)(crc>>8));
 }
+
 
 void MainWindow::go()
 {
@@ -79,25 +91,30 @@ void MainWindow::go()
     t->start();
 }
 
-void MainWindow::data(){
-
-        buffer.clear();
-        buffer.append((char)0xff);
-        buffer.append((char)0x07);
-        buffer.append((char)0x78);
-        buffer.append((char)0x00);
-        buffer.append((char)0x78);
-        buffer.append((char)0x00);
-        buffer.append((char)0x50);
-
-        quint16 crc=crc16(buffer);
-        buffer.append((char)crc);
-        buffer.append((char)(crc>>8));
+void MainWindow::lets()
+{
+    QTimer *t=new QTimer(this);
+    t->setInterval(25);
+    connect(t, SIGNAL(timeout()),this,SLOT(recoi()));
+    t->start();
 }
 
+
 void MainWindow::envoi(){
+
     soc->write(buffer);
     soc->flush();
+}
+
+void MainWindow::recoi(){
+
+    soc->waitForReadyRead(20);
+    data.clear();
+    data=soc->read(21); //rpz
+    QString deCheval;
+    deCheval=data.toHex();
+    ui->label->setText(deCheval);
+
 }
 
 quint16 MainWindow::crc16(QByteArray buffer) {
@@ -122,6 +139,48 @@ quint16 MainWindow::crc16(QByteArray buffer) {
     }
 
     return crc;
+}
+
+void MainWindow::on_dial_sliderMoved(int position)
+{
+    QString BV=ui->comboBox->currentText();
+    int v=ui->verticalSlider->value();
+
+    if(BV=="P"){
+        remplir(0,0,0);
+    }
+    else  if(position<20){
+            if(BV=="D"){
+                remplir(v,v,16);
+            }
+            if(BV=="R"){
+                remplir(v,v,64);
+            }
+            }
+           else if(position>50 && position<80){  //droite
+                    if(BV=="D"){
+                        remplir(v,v-(v*(position-50)/30),80);
+                    }
+                    if(BV=="R"){
+                        remplir(v,v-(v*(position-50)/30),0);
+                    }
+                 }
+            else if(position>20 && position<50){  //gauche
+                if(BV=="D"){
+                 remplir(v-(-v*(position-50)/30),v,80);
+                 }
+                 if(BV=="R"){
+                 remplir(v-(-v*(position-50)/30),v,0);
+                }
+            }
+                 else if(position>80){
+                        if(BV=="D"){
+                            remplir(v,v,64);
+                        }
+                        if(BV=="R"){
+                            remplir(v,v,16);
+                        }
+                 }
 }
 
 

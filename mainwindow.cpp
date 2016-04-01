@@ -16,20 +16,12 @@ MainWindow::MainWindow(QWidget *parent2) : QMainWindow(parent2), ui(new Ui::Main
     // signal émis lors de la deconnexion au serveur
 }
 
-void MainWindow::on_menu_tabBarClicked(int index)
-{
-    if(index==0){
-        webcam->setVisible(true);
-    }
-    else webcam->setVisible(false);
-}
-
-
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+/******************************************fonction relié au ui*************************************************************************/
 void MainWindow::on_B_conect_clicked()
 {
     // On annonce sur la fenêtre qu'on est en train de se connecter
@@ -47,11 +39,19 @@ void MainWindow::on_pushButton_clicked()
     soc->disconnectFromHost();
 }
 
+void MainWindow::on_menu_tabBarClicked(int index)
+{
+    if(index==0){
+        webcam->setVisible(true);
+    }
+    else webcam->setVisible(false);
+}
+
 void MainWindow :: connexion_OK()
 {
     ui->Info->setText("connexion OK");
-    this->go();
     this->lets();
+    this->go();
 
 }
 
@@ -63,83 +63,10 @@ void MainWindow::deconnexion()
 
 void MainWindow::on_dial_sliderReleased()
 {
+    ui->dial->setValue(50);
     remplir(0,0,0);
 }
 
-void MainWindow::remplir(char c1,char c2,char c3){
-
-    buffer.clear();
-    buffer.append((char)0xff);
-    buffer.append((char)0x07);
-    buffer.append(c1);
-    buffer.append((char)0x00);
-    buffer.append(c2);
-    buffer.append((char)0x00);
-    buffer.append(c3);
-
-    quint16 crc=crc16(buffer);
-    buffer.append((char)crc);
-    buffer.append((char)(crc>>8));
-}
-
-
-void MainWindow::go()
-{
-    QTimer *t=new QTimer(this);
-    t->setInterval(25);
-    connect(t, SIGNAL(timeout()),this,SLOT(envoi()));
-    t->start();
-}
-
-void MainWindow::lets()
-{
-    QTimer *t=new QTimer(this);
-    t->setInterval(25);
-    connect(t, SIGNAL(timeout()),this,SLOT(recoi()));
-    t->start();
-}
-
-
-void MainWindow::envoi(){
-
-    soc->write(buffer);
-    soc->flush();
-}
-
-void MainWindow::recoi(){
-
-    soc->waitForReadyRead(20);
-    data.clear();
-    data=soc->read(21); //rpz
-    QString deCheval;
-    deCheval=data.toHex();
-    ui->label->setText(deCheval);
-
-}
-
-quint16 MainWindow::crc16(QByteArray buffer) {
-
-    quint16 crc = 0xFFFF;
-    quint16 polynome = 0xA001;
-    unsigned int parity = 0;
-    unsigned int cptBit;
-    unsigned int cptOct;
-
-    for (cptOct = 1; cptOct < 7; cptOct++){
-
-        crc ^= (unsigned char) buffer.at(cptOct);
-
-        for (cptBit = 0; cptBit <= 7 ; cptBit++){
-
-            parity = crc;
-            crc >>= 1;
-
-            if (parity % 2 == true) crc ^= polynome;
-        }
-    }
-
-    return crc;
-}
 
 void MainWindow::on_dial_sliderMoved(int position)
 {
@@ -182,5 +109,92 @@ void MainWindow::on_dial_sliderMoved(int position)
                         }
                  }
 }
+
+/************************************************************fonction maison********************************************************/
+void MainWindow::remplir(char c1,char c2,char c3){
+
+    buffer.clear();
+    buffer.append((char)0xff);
+    buffer.append((char)0x07);
+    buffer.append(c1);
+    buffer.append((char)0x00);
+    buffer.append(c2);
+    buffer.append((char)0x00);
+    buffer.append(c3);
+
+    quint16 crc=crc16(buffer);
+    buffer.append((char)crc);
+    buffer.append((char)(crc>>8));
+}
+
+void MainWindow::lets()
+{
+    QTimer *t2=new QTimer(this);
+    t2->setInterval(20);
+    connect(t2, SIGNAL(timeout()),this,SLOT(recoi()));
+    t2->start();
+}
+
+void MainWindow::go()
+{
+    QTimer *t=new QTimer(this);
+    t->setInterval(25);
+    connect(t, SIGNAL(timeout()),this,SLOT(envoi()));
+    t->start();
+}
+
+void MainWindow::envoi(){
+
+    soc->write(buffer);
+    soc->flush();
+}
+
+void MainWindow::recoi(){
+
+    soc->waitForReadyRead(20);
+    data.clear();
+    data=soc->read(21);//rpz
+
+    //trame entière
+    QString deCheval;
+    deCheval=data.toHex();
+    ui->label->setText(deCheval);
+
+    //vitesse roue droite
+    char vitesseD=((char)((data[10]<<8)+data[9]));
+    float d=(float)(vitesseD);
+    ui->vd->setText(QString::number(d));
+
+    //vitesse roue gauche
+    char vitesseG=((char)((data[1]<<8)+data[0]));
+    float g=(float)(vitesseG);
+    ui->vg->setText(QString::number(g));
+
+}
+
+quint16 MainWindow::crc16(QByteArray buffer) {
+
+    quint16 crc = 0xFFFF;
+    quint16 polynome = 0xA001;
+    unsigned int parity = 0;
+    unsigned int cptBit;
+    unsigned int cptOct;
+
+    for (cptOct = 1; cptOct < 7; cptOct++){
+
+        crc ^= (unsigned char) buffer.at(cptOct);
+
+        for (cptBit = 0; cptBit <= 7 ; cptBit++){
+
+            parity = crc;
+            crc >>= 1;
+
+            if (parity % 2 == true) crc ^= polynome;
+        }
+    }
+
+    return crc;
+}
+
 
 
